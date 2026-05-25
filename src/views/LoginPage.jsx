@@ -4,21 +4,31 @@ import { auth } from "../firebase/config.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  onAuthStateChanged
 } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { setUser } from "../store/usersSlice.js";
 
 function LoginPage() {
-
-  
-
-
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [loginType, setLoginType] = useState("login");
   const [userCredentials, setUserCredentials] = useState({});
   const [error, setError] = useState("");
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      dispatch(
+        setUser({
+          id: user.uid,
+          email: user.email
+        })
+      );
+    } else {
+      dispatch(setUser(null));
+    }
+  });
 
   function handleCredentials(e) {
     setUserCredentials({ ...userCredentials, [e.target.name]: e.target.value });
@@ -32,21 +42,9 @@ function LoginPage() {
       auth,
       userCredentials.email,
       userCredentials.password
-    )
-      .then((userCredential) => {
-        console.log(userCredential.user);
-        dispatch(
-          setUser({
-            id: userCredential.user.uid,
-            email: userCredential.user.email
-          })
-        );
-
-        // const user = userCredential.user;
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
+    ).catch((error) => {
+      setError(error.message);
+    });
   }
 
   function handleLogin(e) {
@@ -57,19 +55,9 @@ function LoginPage() {
       auth,
       userCredentials.email,
       userCredentials.password
-    )
-      .then((userCredential) => {
-        dispatch(
-          setUser({
-            id: userCredential.user.uid,
-            email: userCredential.user.email
-          })
-        );
-        console.log(userCredential.user);
-      })
-      .catch((error) => {
-        setError(error.message);
-      });
+    ).catch((error) => {
+      setError(error.message);
+    });
   }
 
   function handlePasswordReset() {
