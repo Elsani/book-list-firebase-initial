@@ -28,6 +28,9 @@ function LoginPage() {
     } else {
       dispatch(setUser(null));
     }
+    if (isLoading) {
+      setIsLoading(false);
+    }
   });
 
   function handleCredentials(e) {
