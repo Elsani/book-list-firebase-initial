@@ -46,7 +46,7 @@ function SingleBookPage() {
                     <p>{book.synopsis}</p>
                     <div className="read-checkbox">
                         <input 
-                          onClick={()=>{dispatch(toggleRead(book.id))}}
+                          onClick={()=>{dispatch(toggleRead(id: book.id, isRead: book.isRead))}}
                           type="checkbox" 
                           defaultChecked={book.isRead} />
                         <label>{ book.isRead ? "Already Read It" : "Haven't Read it yet" }</label>

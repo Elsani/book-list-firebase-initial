@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
 import {db, auth} from '../firebase/config.js';
 
 
@@ -9,7 +9,7 @@ export const booksSlice = createSlice({
     books: [],
     status: 'idle'
   },
-  reducers: {
+  reducers: { 
     addBook: (books, action) => {
       let newBook = action.payload;
       newBook.id = books.length ? Math.max(...books.map(book => book.id)) + 1 : 1;
@@ -18,17 +18,45 @@ export const booksSlice = createSlice({
     eraseBook: (books, action) => {
         return books.filter(book => book.id != action.payload);
     },
-    toggleRead: (books, action) => {
-        books.map(book => {
-          if (book.id == action.payload) {
+    // toggleRead: (books, action) => {
+    //     books.map(book => {
+    //       if (book.id == action.payload) {
+    //         book.isRead = !book.isRead;
+    //       }
+    //     });
+    // }
+  },
+  extraReducers: (builder) => { 
+   builder
+      .addCase(fetchBooks.pending, (state, action) => {
+        console.log('loading');
+        state.status = 'loading'
+      })
+      .addCase(fetchBooks.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.posts = state.books.concat(action.payload)
+      })
+      .addCase(fetchBooks.rejected, (state, action) => {
+        state.status = 'failed'
+        console.log(action.error.message);
+      })
+      .addCase(toggleRead.fulfilled, (state, action) => {
+        state.books.map(book => {
+          if(book.id == action.payload){
             book.isRead = !book.isRead;
           }
-        });
+        })
+        console.log(action.payload);
+       
+      })
+      .addCase(toggleRead.rejected, (state, action) => {
+        state.status = 'failed'
+        console.log(action.error.message);
+      })
     }
-  }
-})
+});
 
-export const { addBook, eraseBook, toggleRead } = booksSlice.actions;
+export const { addBook, eraseBook } = booksSlice.actions;
 
 export const selectBooks = state => state.books;
 
@@ -42,4 +70,13 @@ export const fetchBooks = createAsyncThunk('books/fetchBooks', async () => {
           bookList.push({ id: doc.id, ...doc.data() });
         });
        return bookList
-})
+});
+
+export const toggleRead = createAsyncThunk('books/toggleRead', async (payload) => {
+
+  const BookRef = doc(db, 'cities', 'DC');
+  await updateDoc(bookRef, {
+    isRead: !payload.isRead
+  });
+  return payload.id;
+});
