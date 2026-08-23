@@ -2,8 +2,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import Notes from "../components/Notes.jsx";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { selectBooks, eraseBook, toggleRead } from "../store/booksSlice.js";
-import { eraseBookNotes } from "../store/notesSlice.js";
+import { eraseBook, toggleRead } from "../store/booksSlice.js";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase/config.js";
 
@@ -17,8 +16,10 @@ function SingleBookPage() {
   const [fetchStatus, setFetchStatus] = useState("idle");
 
   useEffect(() => {
-    fetchBook(id);
-  }, [id]);
+    if (fetchStatus === "idle") {
+      fetchBook(id);
+    }
+  }, []);
 
   function handleToggleRead(info) {
     dispatch(toggleRead({ id: info.id, isRead: info.isRead }));
@@ -92,7 +93,7 @@ function SingleBookPage() {
 
           <Notes bookId={id} />
         </div>
-      ): fetchStatus === "success" ? (
+      ) : fetchStatus === "success" ? (
         <div>
           <p>
             Book not found. Click the button above to go back to the list of
@@ -107,7 +108,7 @@ function SingleBookPage() {
         <div>
           <p>Loading...</p>
         </div>
-      ) }
+      )}
       ;
     </div>
   );
