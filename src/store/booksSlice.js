@@ -9,11 +9,7 @@ import {
   updateDoc,
   deleteDoc,
   addDoc,
-} 
-  
-  from "firebase/firestore";
-
-
+}   from "firebase/firestore";
 
 export const booksSlice = createSlice({
   name: 'books',
@@ -32,7 +28,6 @@ export const booksSlice = createSlice({
   extraReducers: (builder) => { 
    builder
       .addCase(fetchBooks.pending, (state, action) => {
-        console.log('loading');
         state.status = 'loading'
       })
       .addCase(fetchBooks.fulfilled, (state, action) => {
@@ -60,7 +55,6 @@ export const booksSlice = createSlice({
        .addCase(eraseBook.fulfilled, (state, action) => {
          state.books = state.books.filter(book=> book.id !=action.payload);
         state.status = 'succeeded';
-
         })
       .addCase(eraseBook.rejected, (state, action) => {
         state.status = 'failed';
@@ -93,19 +87,17 @@ export const fetchBooks = createAsyncThunk('books/fetchBooks', async () => {
         querySnapshot.forEach((doc) => {
           bookList.push({ id: doc.id, ...doc.data() });
         });
-       return bookList
+       return bookList;
 });
 
 export const toggleRead = createAsyncThunk('books/toggleRead', async (payload) => {
 
-  const BookRef = doc(db, 'cities', 'DC');
+  const BookRef = doc(db, 'books', payload.id);
   await updateDoc(bookRef, {
     isRead: !payload.isRead
   });
   return payload.id;
 });
-
-  
 
 export const eraseBook = createAsyncThunk('books/eraseBook', async (payload) => {
  await deleteDoc (doc(db, 'books',payload));
