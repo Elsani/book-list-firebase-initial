@@ -5,7 +5,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
-  onAuthStateChanged
+  onAuthStateChanged,
 } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { setUser } from "../store/usersSlice.js";
@@ -22,8 +22,8 @@ function LoginPage() {
       dispatch(
         setUser({
           id: user.uid,
-          email: user.email
-        })
+          email: user.email,
+        }),
       );
     } else {
       dispatch(setUser(null));
@@ -43,8 +43,9 @@ function LoginPage() {
 
     createUserWithEmailAndPassword(
       auth,
+
       userCredentials.email,
-      userCredentials.password
+      userCredentials.password,
     ).catch((error) => {
       setError(error.message);
     });
@@ -57,7 +58,7 @@ function LoginPage() {
     signInWithEmailAndPassword(
       auth,
       userCredentials.email,
-      userCredentials.password
+      userCredentials.password,
     ).catch((error) => {
       setError(error.message);
     });
