@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 function BooksPage() {
   const dispatch = useDispatch();
   const books = useSelector(selectBooks).books;
-  const pageTitle = "📖 Book List with Router, Redux & Firebase";
+  const pageTitle = "📖 book List with Redux and Firebase";
   const bookStatus = useSelector(selectBooks).status;
 
   useEffect(() => {
